@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { levels } from "../src/levels";
 import { canEscape } from "../src/rules";
-import { releaseOrder, releaseWaves } from "../src/solve";
+import { peakFree, releaseOrder, releaseWaves } from "../src/solve";
 import { validateLevel } from "../src/validate";
 
 describe("handmade levels", () => {
@@ -18,8 +18,11 @@ describe("handmade levels", () => {
       }
       expect(remaining).toHaveLength(0);
     }
-    for (const level of levels.slice(5)) expect(releaseWaves(level)).toBeGreaterThanOrEqual(2);
-    for (const level of levels.slice(30)) expect(releaseWaves(level)).toBeGreaterThanOrEqual(3);
+    for (const level of levels.slice(5)) {
+      expect(releaseWaves(level), level.id).toBe(level.snakes.length);
+      expect(peakFree(level), level.id).toBe(1);
+    }
+    for (const level of levels.slice(15)) expect(level.snakes.length).toBeGreaterThanOrEqual(5);
   });
 
   it("makes the bent snake on level 2 able to leave", () => {

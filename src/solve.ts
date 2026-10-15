@@ -2,13 +2,23 @@ import { canEscape } from "./rules";
 import type { Level, Snake } from "./types";
 
 export function releaseWaves(level: Level): number {
+  const waves = waveSizes(level);
+  return waves.length === 0 ? 0 : waves.length;
+}
+
+export function peakFree(level: Level): number {
+  const waves = waveSizes(level);
+  return waves.reduce((peak, count) => Math.max(peak, count), 0);
+}
+
+function waveSizes(level: Level): number[] {
   let remaining = level.snakes;
-  let waves = 0;
+  const waves: number[] = [];
   while (remaining.length > 0) {
     const board = { width: level.width, height: level.height, snakes: remaining };
     const free = remaining.filter((snake) => canEscape(board, snake.id));
-    if (free.length === 0) return 0;
-    waves += 1;
+    if (free.length === 0) return [];
+    waves.push(free.length);
     const leaving = new Set(free.map((snake) => snake.id));
     remaining = remaining.filter((snake) => !leaving.has(snake.id));
   }

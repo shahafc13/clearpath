@@ -2,7 +2,8 @@ html,
 body {
   margin: 0;
   height: 100%;
-  background: #f4f1ea;
+  background:
+    radial-gradient(ellipse at 50% 18%, #fbf6ee 0%, #f3eadc 46%, #e7dccb 100%);
   color: #1c1915;
   font-family: "Iowan Old Style", Palatino, "Palatino Linotype", serif;
 }
@@ -85,6 +86,13 @@ h1 {
   font-size: 16px;
 }
 
+.pips {
+  margin-top: 4px;
+  color: #c4512c;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+}
+
 .tools {
   display: flex;
   gap: 8px;
@@ -103,6 +111,21 @@ h1 {
   align-items: center;
   min-height: 68px;
   padding: 8px 16px max(12px, env(safe-area-inset-bottom));
+}
+
+#next {
+  animation: rise 280ms ease;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .sheet {
@@ -179,9 +202,20 @@ h1 {
 }
 
 #level-grid button {
-  min-height: 52px;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 4px 0;
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.star-row {
+  color: #c4512c;
+  font-size: 11px;
+  letter-spacing: 0.04em;
 }
 
 #level-grid button.cleared {

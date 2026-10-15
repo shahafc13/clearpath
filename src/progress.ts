@@ -3,12 +3,19 @@ export interface Progress {
   unlocked: number;
   completed: boolean;
   seenLesson: boolean;
+  stars: number[];
 }
 
 const KEY = "clearpath.progress";
 
 export function emptyProgress(): Progress {
-  return { current: 0, unlocked: 1, completed: false, seenLesson: false };
+  return { current: 0, unlocked: 1, completed: false, seenLesson: false, stars: [] };
+}
+
+export function starsForBumps(bumps: number): number {
+  if (bumps <= 0) return 3;
+  if (bumps === 1) return 2;
+  return 1;
 }
 
 export function loadProgress(total: number, storage: Pick<Storage, "getItem">): Progress {
@@ -27,6 +34,7 @@ export function loadProgress(total: number, storage: Pick<Storage, "getItem">): 
       unlocked,
       completed,
       seenLesson: record.seenLesson === true,
+      stars: readStars(record.stars, total),
     };
   } catch {
     return fallback;
@@ -41,17 +49,26 @@ export function saveProgress(progress: Progress, storage: Pick<Storage, "setItem
   }
 }
 
-export function recordClear(progress: Progress, levelIndex: number, total: number): Progress {
+export function recordClear(progress: Progress, levelIndex: number, total: number, bumps: number): Progress {
   const wasFrontier = levelIndex >= progress.unlocked - 1;
   const unlocked = Math.min(total, Math.max(progress.unlocked, levelIndex + 2));
   const completed = progress.completed || levelIndex === total - 1;
   const current = completed ? 0 : wasFrontier ? Math.min(levelIndex + 1, total - 1) : progress.current;
+  const stars = progress.stars.slice();
+  while (stars.length <= levelIndex) stars.push(0);
+  stars[levelIndex] = Math.max(stars[levelIndex] ?? 0, starsForBumps(bumps));
   return {
     current,
     unlocked,
     completed,
     seenLesson: progress.seenLesson,
+    stars,
   };
+}
+
+function readStars(value: unknown, total: number): number[] {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, total).map((entry) => clamp(entry, 0, 3, 0));
 }
 
 function clamp(value: unknown, min: number, max: number, fallback: number): number {

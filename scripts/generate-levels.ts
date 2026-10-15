@@ -1,10 +1,10 @@
 import { writeFileSync } from "node:fs";
-import { canEscape } from "../src/rules";
-import { releaseOrder, releaseWaves } from "../src/solve";
+import { canEscape, cellsAhead } from "../src/rules";
+import { peakFree, releaseOrder, releaseWaves } from "../src/solve";
 import type { Cell, Direction, Level, Snake } from "../src/types";
 import { validateLevel } from "../src/validate";
 
-const LETTERS = ["a", "b", "c", "d", "e"];
+const LETTERS = ["a", "b", "c", "d", "e", "f"];
 
 const teaching: Level[] = [
   {
@@ -84,18 +84,16 @@ interface Spec {
   width: number;
   height: number;
   count: number;
-  minWaves: number;
   minBends: number;
+  minLength: number;
+  minAhead: number;
 }
 
 function specFor(index: number): Spec {
-  if (index < 10) return { width: 4, height: 4, count: 2, minWaves: 2, minBends: 0 };
-  if (index < 15) return { width: 5, height: 4, count: 3, minWaves: 2, minBends: 0 };
-  if (index < 20) return { width: 5, height: 5, count: 3, minWaves: 2, minBends: 1 };
-  if (index < 25) return { width: 6, height: 5, count: 3, minWaves: 2, minBends: 1 };
-  if (index < 30) return { width: 6, height: 5, count: 4, minWaves: 2, minBends: 1 };
-  if (index < 35) return { width: 6, height: 6, count: 4, minWaves: 3, minBends: 1 };
-  return { width: 6, height: 6, count: 5, minWaves: 3, minBends: 2 };
+  if (index < 12) return { width: 5, height: 5, count: 4, minBends: 1, minLength: 2, minAhead: 2 };
+  if (index < 24) return { width: 6, height: 6, count: 5, minBends: 2, minLength: 3, minAhead: 2 };
+  if (index < 32) return { width: 7, height: 6, count: 5, minBends: 2, minLength: 3, minAhead: 2 };
+  return { width: 7, height: 7, count: 6, minBends: 3, minLength: 3, minAhead: 2 };
 }
 
 function mulberry32(seed: number): () => number {
@@ -141,7 +139,7 @@ function neighbors(cell: Cell, width: number, height: number): Cell[] {
   ].filter((next) => next.x >= 0 && next.y >= 0 && next.x < width && next.y < height);
 }
 
-function grow(width: number, height: number, filled: Set<string>, id: string, rng: () => number): Snake | null {
+function grow(width: number, height: number, filled: Set<string>, id: string, minLength: number, rng: () => number): Snake | null {
   const open: Cell[] = [];
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
@@ -149,7 +147,7 @@ function grow(width: number, height: number, filled: Set<string>, id: string, rn
     }
   }
   if (open.length < 2) return null;
-  const length = 2 + Math.floor(rng() * 3);
+  const length = minLength + Math.floor(rng() * (6 - minLength));
   for (let attempt = 0; attempt < 24; attempt += 1) {
     const cells = [open[Math.floor(rng() * open.length)]];
     while (cells.length < length) {
@@ -161,7 +159,7 @@ function grow(width: number, height: number, filled: Set<string>, id: string, rn
       if (options.length === 0) break;
       cells.push(options[Math.floor(rng() * options.length)]);
     }
-    if (cells.length < 2) continue;
+    if (cells.length < minLength) continue;
     const direction = directionOf(cells[cells.length - 2], cells[cells.length - 1]);
     if (!direction) continue;
     return { id, direction, cells };
@@ -184,21 +182,23 @@ function acceptable(level: Level, spec: Spec): boolean {
     return false;
   }
   if (!releaseOrder(level)) return false;
-  if (releaseWaves(level) < spec.minWaves) return false;
+  if (peakFree(level) !== 1 || releaseWaves(level) !== level.snakes.length) return false;
   const bends = level.snakes.filter(hasBend).length;
   if (bends < spec.minBends) return false;
-  const blocked = level.snakes.some((snake) => !canEscape(level, snake.id));
-  return blocked;
+  if (level.snakes.some((snake) => snake.cells.length < spec.minLength)) return false;
+  const free = level.snakes.find((snake) => canEscape(level, snake.id));
+  if (!free) return false;
+  return cellsAhead(level.width, level.height, free).length >= spec.minAhead;
 }
 
 function build(index: number, rng: () => number, seen: Set<string>): Level {
   const spec = specFor(index);
-  for (let attempt = 0; attempt < 20000; attempt += 1) {
+  for (let attempt = 0; attempt < 80000; attempt += 1) {
     const filled = new Set<string>();
     const snakes: Snake[] = [];
     let failed = false;
     for (let count = 0; count < spec.count; count += 1) {
-      const snake = grow(spec.width, spec.height, filled, LETTERS[count], rng);
+      const snake = grow(spec.width, spec.height, filled, LETTERS[count], spec.minLength, rng);
       if (!snake) {
         failed = true;
         break;
@@ -232,7 +232,7 @@ function literal(level: Level): string {
 }
 
 const seen = new Set(teaching.map(fingerprint));
-const rng = mulberry32(20261015);
+const rng = mulberry32(20261016);
 const campaign = [...teaching];
 for (let index = teaching.length; index < 40; index += 1) {
   campaign.push(build(index, rng, seen));

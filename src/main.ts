@@ -1,19 +1,19 @@
 import "./style.css";
 import { lessonBlocked, lessonFree } from "./lesson";
 import { levels } from "./levels";
-import { BOARD_MARGIN, drawBoard } from "./render";
+import { BOARD_MARGIN, BUMP_MS, SLIDE_MS, drawBoard, type Departure } from "./render";
 import { boardOrigin, cellAt, cellSize } from "./layout";
-import { loadProgress, recordClear, saveProgress, type Progress } from "./progress";
+import { loadProgress, recordClear, saveProgress, starsForBumps, type Progress } from "./progress";
 import { canEscape, isWon, snakeAt, stepSnake } from "./rules";
 import { playBump, playClear, playLeave } from "./sound";
 import type { Level, Snake } from "./types";
 import { LevelError, validateLevel } from "./validate";
 
-const STEP_MS = 140;
-const BUMP_MS = 260;
 
 const status = query<HTMLParagraphElement>("#status");
 const hint = query<HTMLParagraphElement>("#hint");
+const pips = query<HTMLParagraphElement>("#pips");
+const score = query<HTMLParagraphElement>("#score");
 const board = query<HTMLCanvasElement>("#board");
 const nextButton = query<HTMLButtonElement>("#next");
 const restartButton = query<HTMLButtonElement>("#restart");
@@ -55,9 +55,16 @@ let levelIndex = 0;
 let activeLevel: Level = levels[0];
 let snakes: Snake[] = [];
 const leaving = new Set<string>();
+const travel = new Map<string, number>();
 const bumpUntil = new Map<string, number>();
+let departures: Departure[] = [];
+let enteredAt = 0;
+let celebrateAt = 0;
 let won = false;
-let lastStep = 0;
+let lastFrame = 0;
+let attemptBumps = 0;
+
+const BUMP_LIMIT = 3;
 
 function query<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -88,6 +95,26 @@ function cloneSnakes(source: Snake[]): Snake[] {
   }));
 }
 
+function paintScore(): void {
+  const earned = progress.stars.reduce((sum, count) => sum + count, 0);
+  const total = levels.length * 3;
+  score.textContent =
+    earned === 0
+      ? "Three bumps send the snakes back. A clear with no bumps is worth 3 stars."
+      : `${earned} of ${total} stars. Three bumps send the snakes back.`;
+}
+
+function paintPips(): void {
+  if (screen !== "play") {
+    pips.hidden = true;
+    return;
+  }
+  const left = BUMP_LIMIT - attemptBumps;
+  pips.hidden = false;
+  pips.textContent = "●".repeat(left) + "○".repeat(attemptBumps);
+  pips.setAttribute("aria-label", left === 1 ? "1 bump left" : `${left} bumps left`);
+}
+
 function atStart(): boolean {
   return progress.current === 0 && progress.unlocked === 1 && !progress.completed;
 }
@@ -109,7 +136,11 @@ function show(nextScreen: Screen): void {
   restartButton.hidden = nextScreen !== "play";
   levelsButton.hidden = nextScreen !== "play";
   skipLesson.hidden = nextScreen !== "lesson";
-  if (nextScreen === "home") playButton.textContent = playLabel();
+  if (nextScreen === "home") {
+    playButton.textContent = playLabel();
+    paintScore();
+  }
+  paintPips();
   if (playing) requestAnimationFrame(resize);
 }
 
@@ -118,15 +149,23 @@ function begin(level: Level, index: number): void {
   levelIndex = index;
   snakes = cloneSnakes(level.snakes);
   leaving.clear();
+  travel.clear();
   bumpUntil.clear();
+  departures = [];
+  enteredAt = performance.now();
+  celebrateAt = 0;
   won = false;
+  attemptBumps = 0;
   nextButton.hidden = true;
   hint.textContent = "";
 }
 
 function loadCampaign(index: number): void {
   begin(levels[index], index);
-  status.textContent = `Level ${index + 1} of ${levels.length}. Click a snake to send it off.`;
+  status.textContent =
+    index < 5
+      ? `Level ${index + 1} of ${levels.length}. Click a snake to send it off.`
+      : `Level ${index + 1} of ${levels.length}. One snake can leave.`;
   show("play");
 }
 
@@ -148,6 +187,7 @@ function finishLesson(): void {
 function showWin(): void {
   if (won) return;
   won = true;
+  celebrateAt = performance.now();
   playClear();
   hint.textContent = "";
   if (screen === "lesson") {
@@ -161,10 +201,14 @@ function showWin(): void {
     nextButton.hidden = false;
     return;
   }
-  progress = recordClear(progress, levelIndex, levels.length);
+  const earned = starsForBumps(attemptBumps);
+  progress = recordClear(progress, levelIndex, levels.length, attemptBumps);
   saveProgress(progress, store);
   const last = levelIndex === levels.length - 1;
-  status.textContent = last ? "Every snake has left. The path is clear." : `Level ${levelIndex + 1} clear.`;
+  const starLine = earned === 3 ? "Clean clear. 3 stars." : earned === 2 ? "2 stars." : "1 star.";
+  status.textContent = last ? `The path is clear. ${starLine}` : `Level ${levelIndex + 1} clear. ${starLine}`;
+  const best = progress.stars[levelIndex] ?? earned;
+  if (best > earned) hint.textContent = `Best on this level: ${best} stars.`;
   nextButton.textContent = last ? "Choose a level" : "Next level";
   nextButton.hidden = false;
 }
@@ -176,7 +220,17 @@ function renderLevels(): void {
     button.type = "button";
     const open = index < progress.unlocked;
     const cleared = progress.completed || index < progress.unlocked - 1;
-    button.textContent = String(index + 1);
+    const number = document.createElement("span");
+    number.textContent = String(index + 1);
+    button.append(number);
+    const rating = progress.stars[index] ?? 0;
+    if (cleared) {
+      const stars = document.createElement("span");
+      stars.className = "star-row";
+      stars.textContent = "★".repeat(rating) + "☆".repeat(3 - rating);
+      button.append(stars);
+      button.setAttribute("aria-label", `Level ${index + 1}, ${rating} stars`);
+    }
     button.disabled = !open;
     if (cleared) button.classList.add("cleared");
     if (open && !progress.completed && index === progress.current) button.setAttribute("aria-current", "true");
@@ -196,49 +250,56 @@ function resize(): void {
   draw();
 }
 
-function bumpShift(now: number): Record<string, { x: number; y: number }> {
-  const shifts: Record<string, { x: number; y: number }> = {};
-  for (const [id, until] of bumpUntil) {
-    const remaining = until - now;
-    if (remaining <= 0) {
-      bumpUntil.delete(id);
+function draw(): void {
+  const now = performance.now();
+  departures = departures.filter((ghost) => now - ghost.startedAt < SLIDE_MS);
+  drawBoard(ctx!, board.width, board.height, activeLevel, snakes, {
+    now,
+    travel,
+    bumps: bumpUntil,
+    departures,
+    enteredAt,
+    celebrateAt,
+    guides: screen === "lesson" || levelIndex < 5,
+  });
+}
+
+function advance(now: number): void {
+  const dt = Math.min(48, now - lastFrame);
+  lastFrame = now;
+  const nextSnakes: Snake[] = [];
+  for (const snake of snakes) {
+    if (!leaving.has(snake.id)) {
+      nextSnakes.push(snake);
       continue;
     }
-    const snake = snakes.find((entry) => entry.id === id);
-    if (!snake) continue;
-    const progressRatio = 1 - remaining / BUMP_MS;
-    const amount = Math.sin(progressRatio * Math.PI) * 0.32;
-    const step = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } }[
-      snake.direction
-    ];
-    shifts[id] = { x: step.x * amount, y: step.y * amount };
-  }
-  return shifts;
-}
-
-function draw(): void {
-  drawBoard(ctx!, board.width, board.height, activeLevel, snakes, bumpShift(performance.now()));
-}
-
-function stepLeaving(): void {
-  snakes = snakes.flatMap((snake) => {
-    if (!leaving.has(snake.id)) return [snake];
-    const moved = stepSnake(snake, activeLevel.width, activeLevel.height);
-    if (!moved) {
-      leaving.delete(snake.id);
-      return [];
+    let progressed = (travel.get(snake.id) ?? 0) + dt / SLIDE_MS;
+    let current: Snake | null = snake;
+    while (current && progressed >= 1) {
+      progressed -= 1;
+      const stepped = stepSnake(current, activeLevel.width, activeLevel.height);
+      if (!stepped) {
+        departures.push({ snake: current, startedAt: now });
+        leaving.delete(snake.id);
+        travel.delete(snake.id);
+        current = null;
+        break;
+      }
+      current = stepped;
     }
-    return [moved];
-  });
+    if (current) {
+      travel.set(current.id, progressed);
+      nextSnakes.push(current);
+    }
+  }
+  snakes = nextSnakes;
   if (isWon(snakes)) showWin();
 }
 
 function frame(now: number): void {
   const playing = screen === "play" || screen === "lesson";
-  if (playing && now - lastStep >= STEP_MS) {
-    lastStep = now;
-    if (!won) stepLeaving();
-  }
+  if (playing && !won) advance(now);
+  else lastFrame = now;
   if (playing) draw();
   requestAnimationFrame(frame);
 }
@@ -260,11 +321,21 @@ board.addEventListener("click", (event) => {
     if (screen === "lesson" && lessonStep === "blocked") {
       status.textContent = "The green snake stays. Send the rust snake off first.";
     } else if (screen === "play") {
-      hint.textContent = "That path is blocked.";
+      attemptBumps += 1;
+      if (attemptBumps >= BUMP_LIMIT) {
+        begin(activeLevel, levelIndex);
+        hint.textContent = "Three bumps. The snakes are back. Look before you tap.";
+        paintPips();
+        return;
+      }
+      const left = BUMP_LIMIT - attemptBumps;
+      hint.textContent = left === 1 ? "One bump left." : `${left} bumps left.`;
+      paintPips();
     }
     return;
   }
   leaving.add(snake.id);
+  travel.set(snake.id, 0);
   playLeave();
   if (screen === "play") hint.textContent = "";
   if (screen === "lesson" && lessonStep === "blocked" && snake.id === "rust") {
@@ -312,6 +383,6 @@ levelsHome.addEventListener("click", () => show("home"));
 window.addEventListener("resize", resize);
 show("home");
 requestAnimationFrame((now) => {
-  lastStep = now;
+  lastFrame = now;
   requestAnimationFrame(frame);
 });
