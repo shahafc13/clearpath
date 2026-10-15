@@ -1,0 +1,415 @@
+import type { Level } from "./types";
+
+export const levels: Level[] = [
+  {
+    id: "1",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 1 }, { x: 1, y: 1 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 3 }, { x: 1, y: 3 }] },
+    ],
+  },
+  {
+    id: "2",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] },
+    { id: "b", direction: "left", cells: [{ x: 3, y: 3 }, { x: 2, y: 3 }] },
+    ],
+  },
+  {
+    id: "3",
+    width: 4,
+    height: 3,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }] },
+    { id: "b", direction: "up", cells: [{ x: 1, y: 2 }, { x: 1, y: 1 }] },
+    ],
+  },
+  {
+    id: "4",
+    width: 5,
+    height: 3,
+    snakes: [
+    { id: "gate", direction: "up", cells: [{ x: 0, y: 2 }, { x: 0, y: 1 }] },
+    { id: "long", direction: "left", cells: [{ x: 4, y: 1 }, { x: 3, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 }] },
+    ],
+  },
+  {
+    id: "5",
+    width: 5,
+    height: 4,
+    snakes: [
+    { id: "bent", direction: "right", cells: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] },
+    { id: "vertical", direction: "up", cells: [{ x: 1, y: 3 }, { x: 1, y: 2 }] },
+    { id: "side", direction: "left", cells: [{ x: 4, y: 3 }, { x: 3, y: 3 }] },
+    ],
+  },
+  {
+    id: "6",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] },
+    { id: "b", direction: "right", cells: [{ x: 2, y: 1 }, { x: 2, y: 0 }, { x: 3, y: 0 }] },
+    ],
+  },
+  {
+    id: "7",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }] },
+    { id: "b", direction: "down", cells: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }] },
+    ],
+  },
+  {
+    id: "8",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "down", cells: [{ x: 1, y: 0 }, { x: 1, y: 1 }] },
+    { id: "b", direction: "left", cells: [{ x: 2, y: 2 }, { x: 1, y: 2 }, { x: 0, y: 2 }] },
+    ],
+  },
+  {
+    id: "9",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 1, y: 3 }, { x: 1, y: 2 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }] },
+    ],
+  },
+  {
+    id: "10",
+    width: 4,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 2, y: 3 }, { x: 3, y: 3 }, { x: 3, y: 2 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 2 }, { x: 1, y: 2 }] },
+    ],
+  },
+  {
+    id: "11",
+    width: 5,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 1, y: 3 }, { x: 2, y: 3 }] },
+    { id: "b", direction: "up", cells: [{ x: 3, y: 2 }, { x: 3, y: 1 }] },
+    { id: "c", direction: "down", cells: [{ x: 4, y: 2 }, { x: 4, y: 3 }] },
+    ],
+  },
+  {
+    id: "12",
+    width: 5,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }, { x: 0, y: 0 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 3 }, { x: 0, y: 2 }, { x: 1, y: 2 }] },
+    { id: "c", direction: "right", cells: [{ x: 2, y: 2 }, { x: 2, y: 3 }, { x: 3, y: 3 }] },
+    ],
+  },
+  {
+    id: "13",
+    width: 5,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }] },
+    { id: "b", direction: "down", cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }] },
+    { id: "c", direction: "left", cells: [{ x: 1, y: 2 }, { x: 0, y: 2 }] },
+    ],
+  },
+  {
+    id: "14",
+    width: 5,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 3, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }] },
+    { id: "b", direction: "down", cells: [{ x: 0, y: 1 }, { x: 0, y: 2 }] },
+    { id: "c", direction: "up", cells: [{ x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 2, y: 2 }] },
+    ],
+  },
+  {
+    id: "15",
+    width: 5,
+    height: 4,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }] },
+    { id: "b", direction: "down", cells: [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }] },
+    { id: "c", direction: "left", cells: [{ x: 1, y: 3 }, { x: 2, y: 3 }, { x: 2, y: 2 }, { x: 1, y: 2 }] },
+    ],
+  },
+  {
+    id: "16",
+    width: 5,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 3 }] },
+    { id: "b", direction: "down", cells: [{ x: 4, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }] },
+    { id: "c", direction: "down", cells: [{ x: 4, y: 3 }, { x: 3, y: 3 }, { x: 3, y: 4 }] },
+    ],
+  },
+  {
+    id: "17",
+    width: 5,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 1, y: 3 }, { x: 2, y: 3 }, { x: 2, y: 2 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 4 }, { x: 1, y: 4 }, { x: 2, y: 4 }, { x: 3, y: 4 }] },
+    { id: "c", direction: "down", cells: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }] },
+    ],
+  },
+  {
+    id: "18",
+    width: 5,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }] },
+    { id: "b", direction: "left", cells: [{ x: 3, y: 4 }, { x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }] },
+    { id: "c", direction: "down", cells: [{ x: 2, y: 2 }, { x: 2, y: 3 }, { x: 2, y: 4 }] },
+    ],
+  },
+  {
+    id: "19",
+    width: 5,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 0, y: 3 }, { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 1 }] },
+    { id: "b", direction: "left", cells: [{ x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }] },
+    { id: "c", direction: "down", cells: [{ x: 3, y: 0 }, { x: 3, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 2 }] },
+    ],
+  },
+  {
+    id: "20",
+    width: 5,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 2, y: 3 }, { x: 2, y: 2 }] },
+    { id: "b", direction: "left", cells: [{ x: 4, y: 4 }, { x: 4, y: 3 }, { x: 3, y: 3 }] },
+    { id: "c", direction: "left", cells: [{ x: 1, y: 0 }, { x: 0, y: 0 }] },
+    ],
+  },
+  {
+    id: "21",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 1, y: 0 }, { x: 0, y: 0 }] },
+    { id: "b", direction: "up", cells: [{ x: 1, y: 4 }, { x: 0, y: 4 }, { x: 0, y: 3 }] },
+    { id: "c", direction: "up", cells: [{ x: 3, y: 2 }, { x: 2, y: 2 }, { x: 2, y: 1 }] },
+    ],
+  },
+  {
+    id: "22",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 5, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 0 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 2 }, { x: 1, y: 2 }] },
+    { id: "c", direction: "right", cells: [{ x: 0, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }] },
+    ],
+  },
+  {
+    id: "23",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 2, y: 2 }, { x: 2, y: 3 }, { x: 2, y: 4 }, { x: 3, y: 4 }] },
+    { id: "b", direction: "right", cells: [{ x: 2, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }, { x: 2, y: 0 }] },
+    { id: "c", direction: "down", cells: [{ x: 5, y: 1 }, { x: 5, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 1 }] },
+    ],
+  },
+  {
+    id: "24",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "down", cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }] },
+    { id: "b", direction: "right", cells: [{ x: 1, y: 4 }, { x: 2, y: 4 }, { x: 3, y: 4 }] },
+    { id: "c", direction: "down", cells: [{ x: 3, y: 1 }, { x: 3, y: 2 }] },
+    ],
+  },
+  {
+    id: "25",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 1 }] },
+    { id: "b", direction: "left", cells: [{ x: 3, y: 3 }, { x: 3, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 }] },
+    { id: "c", direction: "left", cells: [{ x: 5, y: 2 }, { x: 4, y: 2 }] },
+    ],
+  },
+  {
+    id: "26",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }] },
+    { id: "b", direction: "left", cells: [{ x: 3, y: 3 }, { x: 3, y: 4 }, { x: 2, y: 4 }, { x: 1, y: 4 }] },
+    { id: "c", direction: "down", cells: [{ x: 1, y: 1 }, { x: 1, y: 2 }] },
+    { id: "d", direction: "up", cells: [{ x: 5, y: 1 }, { x: 5, y: 2 }, { x: 4, y: 2 }, { x: 4, y: 1 }] },
+    ],
+  },
+  {
+    id: "27",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "down", cells: [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 4, y: 2 }] },
+    { id: "b", direction: "down", cells: [{ x: 2, y: 3 }, { x: 3, y: 3 }, { x: 4, y: 3 }, { x: 4, y: 4 }] },
+    { id: "c", direction: "up", cells: [{ x: 5, y: 3 }, { x: 5, y: 2 }] },
+    { id: "d", direction: "left", cells: [{ x: 3, y: 4 }, { x: 2, y: 4 }] },
+    ],
+  },
+  {
+    id: "28",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 2, y: 4 }, { x: 3, y: 4 }, { x: 4, y: 4 }] },
+    { id: "b", direction: "left", cells: [{ x: 5, y: 1 }, { x: 5, y: 0 }, { x: 4, y: 0 }] },
+    { id: "c", direction: "down", cells: [{ x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }] },
+    { id: "d", direction: "left", cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 1 }, { x: 2, y: 1 }] },
+    ],
+  },
+  {
+    id: "29",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }] },
+    { id: "b", direction: "left", cells: [{ x: 4, y: 1 }, { x: 3, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 }] },
+    { id: "c", direction: "right", cells: [{ x: 1, y: 4 }, { x: 2, y: 4 }, { x: 3, y: 4 }] },
+    { id: "d", direction: "down", cells: [{ x: 4, y: 2 }, { x: 3, y: 2 }, { x: 3, y: 3 }] },
+    ],
+  },
+  {
+    id: "30",
+    width: 6,
+    height: 5,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 3, y: 2 }, { x: 2, y: 2 }, { x: 2, y: 1 }, { x: 1, y: 1 }] },
+    { id: "b", direction: "right", cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }] },
+    { id: "c", direction: "down", cells: [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 4, y: 2 }] },
+    { id: "d", direction: "up", cells: [{ x: 2, y: 4 }, { x: 2, y: 3 }] },
+    ],
+  },
+  {
+    id: "31",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 4, y: 5 }, { x: 3, y: 5 }, { x: 3, y: 4 }] },
+    { id: "b", direction: "down", cells: [{ x: 5, y: 1 }, { x: 5, y: 2 }] },
+    { id: "c", direction: "left", cells: [{ x: 5, y: 4 }, { x: 4, y: 4 }] },
+    { id: "d", direction: "down", cells: [{ x: 4, y: 0 }, { x: 4, y: 1 }] },
+    ],
+  },
+  {
+    id: "32",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 5, y: 3 }, { x: 5, y: 2 }, { x: 5, y: 1 }] },
+    { id: "b", direction: "left", cells: [{ x: 3, y: 5 }, { x: 2, y: 5 }] },
+    { id: "c", direction: "right", cells: [{ x: 2, y: 4 }, { x: 2, y: 3 }, { x: 3, y: 3 }] },
+    { id: "d", direction: "down", cells: [{ x: 4, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 1 }, { x: 3, y: 2 }] },
+    ],
+  },
+  {
+    id: "33",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 0, y: 3 }, { x: 0, y: 4 }, { x: 1, y: 4 }] },
+    { id: "b", direction: "up", cells: [{ x: 5, y: 5 }, { x: 5, y: 4 }] },
+    { id: "c", direction: "down", cells: [{ x: 3, y: 0 }, { x: 3, y: 1 }] },
+    { id: "d", direction: "right", cells: [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 5, y: 1 }] },
+    ],
+  },
+  {
+    id: "34",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 4, y: 2 }, { x: 4, y: 3 }, { x: 5, y: 3 }] },
+    { id: "b", direction: "up", cells: [{ x: 5, y: 5 }, { x: 5, y: 4 }] },
+    { id: "c", direction: "left", cells: [{ x: 3, y: 1 }, { x: 3, y: 0 }, { x: 2, y: 0 }] },
+    { id: "d", direction: "right", cells: [{ x: 1, y: 4 }, { x: 2, y: 4 }] },
+    ],
+  },
+  {
+    id: "35",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "left", cells: [{ x: 3, y: 5 }, { x: 2, y: 5 }] },
+    { id: "b", direction: "up", cells: [{ x: 1, y: 4 }, { x: 1, y: 5 }, { x: 0, y: 5 }, { x: 0, y: 4 }] },
+    { id: "c", direction: "left", cells: [{ x: 5, y: 0 }, { x: 5, y: 1 }, { x: 4, y: 1 }] },
+    { id: "d", direction: "down", cells: [{ x: 1, y: 0 }, { x: 1, y: 1 }] },
+    ],
+  },
+  {
+    id: "36",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 1, y: 1 }, { x: 2, y: 1 }] },
+    { id: "b", direction: "left", cells: [{ x: 2, y: 0 }, { x: 1, y: 0 }] },
+    { id: "c", direction: "up", cells: [{ x: 2, y: 5 }, { x: 2, y: 4 }, { x: 2, y: 3 }] },
+    { id: "d", direction: "up", cells: [{ x: 4, y: 3 }, { x: 4, y: 4 }, { x: 5, y: 4 }, { x: 5, y: 3 }] },
+    { id: "e", direction: "right", cells: [{ x: 0, y: 4 }, { x: 0, y: 5 }, { x: 1, y: 5 }] },
+    ],
+  },
+  {
+    id: "37",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }] },
+    { id: "b", direction: "left", cells: [{ x: 4, y: 3 }, { x: 3, y: 3 }] },
+    { id: "c", direction: "right", cells: [{ x: 4, y: 1 }, { x: 5, y: 1 }] },
+    { id: "d", direction: "right", cells: [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 1, y: 2 }] },
+    { id: "e", direction: "right", cells: [{ x: 2, y: 2 }, { x: 2, y: 1 }, { x: 3, y: 1 }] },
+    ],
+  },
+  {
+    id: "38",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "up", cells: [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }] },
+    { id: "b", direction: "left", cells: [{ x: 5, y: 3 }, { x: 5, y: 4 }, { x: 5, y: 5 }, { x: 4, y: 5 }] },
+    { id: "c", direction: "right", cells: [{ x: 2, y: 3 }, { x: 3, y: 3 }, { x: 4, y: 3 }] },
+    { id: "d", direction: "right", cells: [{ x: 2, y: 2 }, { x: 2, y: 1 }, { x: 2, y: 0 }, { x: 3, y: 0 }] },
+    { id: "e", direction: "left", cells: [{ x: 3, y: 4 }, { x: 3, y: 5 }, { x: 2, y: 5 }] },
+    ],
+  },
+  {
+    id: "39",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 3, y: 4 }, { x: 3, y: 5 }, { x: 4, y: 5 }] },
+    { id: "b", direction: "up", cells: [{ x: 5, y: 5 }, { x: 5, y: 4 }, { x: 5, y: 3 }, { x: 5, y: 2 }] },
+    { id: "c", direction: "down", cells: [{ x: 4, y: 2 }, { x: 4, y: 3 }, { x: 4, y: 4 }] },
+    { id: "d", direction: "down", cells: [{ x: 1, y: 1 }, { x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }] },
+    { id: "e", direction: "left", cells: [{ x: 2, y: 3 }, { x: 1, y: 3 }, { x: 0, y: 3 }] },
+    ],
+  },
+  {
+    id: "40",
+    width: 6,
+    height: 6,
+    snakes: [
+    { id: "a", direction: "right", cells: [{ x: 1, y: 4 }, { x: 1, y: 3 }, { x: 1, y: 2 }, { x: 2, y: 2 }] },
+    { id: "b", direction: "left", cells: [{ x: 2, y: 0 }, { x: 1, y: 0 }] },
+    { id: "c", direction: "down", cells: [{ x: 3, y: 1 }, { x: 3, y: 2 }] },
+    { id: "d", direction: "right", cells: [{ x: 0, y: 4 }, { x: 0, y: 5 }, { x: 1, y: 5 }, { x: 2, y: 5 }] },
+    { id: "e", direction: "right", cells: [{ x: 3, y: 4 }, { x: 4, y: 4 }] },
+    ],
+  },
+];
