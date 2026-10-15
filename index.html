@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Clearpath is a puzzle about sending snakes off a grid. A snake leaves only when the path ahead is empty."
+    />
+    <meta name="theme-color" content="#f4f1ea" />
+    <title>Clearpath</title>
+    <script type="module" crossorigin src="/clearpath/assets/index-VC_-Skij.js"></script>
+    <link rel="stylesheet" crossorigin href="/clearpath/assets/index-q-p51Ltz.css">
+  </head>
+  <body>
+    <div id="shell">
+      <header id="play-bar" hidden>
+        <div class="titles">
+          <p id="status" aria-live="polite"></p>
+          <p id="hint" aria-live="polite"></p>
+        </div>
+        <div class="tools">
+          <button id="restart" type="button">Restart</button>
+          <button id="to-levels" type="button">Levels</button>
+          <button id="skip-lesson" type="button" hidden>Skip</button>
+        </div>
+      </header>
+      <canvas id="board" hidden></canvas>
+      <div id="play-actions" hidden>
+        <button id="next" type="button" hidden></button>
+      </div>
+
+      <section id="home" class="sheet">
+        <div class="sheet-inner">
+          <p class="eyebrow">A grid puzzle</p>
+          <h1>Clearpath</h1>
+          <p class="lead">Snakes leave only when the path in front of them is clear. Send every snake off the board.</p>
+          <div class="stack">
+            <button id="play" class="primary" type="button">Play</button>
+            <button id="how" type="button">How to play</button>
+            <button id="pick" type="button">Levels</button>
+          </div>
+          <p class="note">Cleared levels stay unlocked on this device. Leaving a board midway starts that board over.</p>
+        </div>
+      </section>
+
+      <section id="levels" class="sheet" hidden>
+        <div class="sheet-inner wide">
+          <div class="sheet-head">
+            <h1>Levels</h1>
+            <button id="levels-home" type="button">Home</button>
+          </div>
+          <div id="level-grid"></div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
